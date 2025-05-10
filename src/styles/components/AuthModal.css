@@ -1,0 +1,137 @@
+.auth-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.auth-modal {
+  background-color: #2a2a2a;
+  border-radius: 1rem;
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.auth-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  color: #a0a0a0;
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: color 0.2s;
+}
+
+.auth-modal-close:hover {
+  color: #ffffff;
+}
+
+.auth-modal-content {
+  text-align: center;
+}
+
+.auth-modal-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 1.5rem;
+}
+
+.auth-error {
+  background-color: rgba(220, 38, 38, 0.1);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  color: #ef4444;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.auth-providers {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.auth-provider-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: 1px solid #4b5563;
+  background-color: transparent;
+  color: #ffffff;
+}
+
+.auth-provider-button:hover {
+  background-color: #3a3a3a;
+  border-color: #6b7280;
+}
+
+.auth-provider-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.auth-provider-button.google {
+  background-color: #ffffff;
+  color: #1a1a1a;
+  border: none;
+}
+
+.auth-provider-button.google:hover {
+  background-color: #f3f4f6;
+}
+
+.auth-provider-button.github {
+  background-color: #24292e;
+  color: #ffffff;
+  border: none;
+}
+
+.auth-provider-button.github:hover {
+  background-color: #2f363d;
+}
+
+.auth-terms {
+  font-size: 0.875rem;
+  color: #a0a0a0;
+  line-height: 1.5;
+}
+
+.auth-terms a {
+  color: #2563eb;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.auth-terms a:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .auth-modal {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+} 

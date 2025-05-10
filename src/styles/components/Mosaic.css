@@ -1,0 +1,289 @@
+.mosaic {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 16px;
+  padding: 16px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.mosaic-item {
+  text-decoration: none;
+  color: inherit;
+  width: 100%;
+}
+
+/* Главная новость */
+.mosaic-item:first-child {
+  grid-column: span 8;
+  grid-row: span 2;
+}
+
+.mosaic-item:first-child .article-card {
+  height: 100%;
+}
+
+.mosaic-item:first-child .article-image {
+  height: 400px;
+}
+
+.mosaic-item:first-child .article-title {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.mosaic-item:first-child .article-description {
+  font-size: 1.125rem;
+  -webkit-line-clamp: 4;
+}
+
+/* Второстепенные новости */
+.mosaic-item:nth-child(2),
+.mosaic-item:nth-child(3) {
+  grid-column: span 4;
+}
+
+.mosaic-item:nth-child(2) .article-image,
+.mosaic-item:nth-child(3) .article-image {
+  height: 200px;
+}
+
+/* Остальные новости */
+.mosaic-item:not(:first-child):not(:nth-child(2)):not(:nth-child(3)) {
+  grid-column: span 3;
+}
+
+.article-card {
+  background: #121212;
+  border-radius: 4px;
+  overflow: hidden;
+  transition: transform 0.2s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #2a2a2a;
+}
+
+.article-card:hover {
+  transform: translateY(-2px);
+}
+
+.article-image {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  background-color: #1a1a1a;
+}
+
+.article-content {
+  padding: 1rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #121212;
+}
+
+.article-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+  color: #ffffff;
+}
+
+.article-description {
+  font-size: 0.875rem;
+  color: #b0b0b0;
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+  -webkit-line-clamp: 2;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.article-meta {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: #808080;
+}
+
+/* Адаптивность */
+@media (max-width: 1200px) {
+  .mosaic {
+    grid-template-columns: repeat(8, 1fr);
+  }
+  
+  .mosaic-item:first-child {
+    grid-column: span 8;
+  }
+  
+  .mosaic-item:nth-child(2),
+  .mosaic-item:nth-child(3) {
+    grid-column: span 4;
+  }
+  
+  .mosaic-item:not(:first-child):not(:nth-child(2)):not(:nth-child(3)) {
+    grid-column: span 4;
+  }
+}
+
+@media (max-width: 768px) {
+  .mosaic {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    padding: 12px;
+  }
+  
+  .mosaic-item:first-child,
+  .mosaic-item:nth-child(2),
+  .mosaic-item:nth-child(3),
+  .mosaic-item:not(:first-child):not(:nth-child(2)):not(:nth-child(3)) {
+    grid-column: span 4;
+  }
+  
+  .mosaic-item:first-child .article-image {
+    height: 300px;
+  }
+  
+  .mosaic-item:first-child .article-title {
+    font-size: 1.5rem;
+  }
+  
+  .article-title {
+    font-size: 1rem;
+  }
+  
+  .article-description {
+    font-size: 0.8125rem;
+  }
+}
+
+/* Стили для карточек в мозаике */
+.mosaic-item .article-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #121212;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  border: 1px solid #2a2a2a;
+}
+
+.mosaic-item .article-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: #3a3a3a;
+}
+
+.mosaic-item .article-image {
+  height: 160px;
+  position: relative;
+  background-color: #1a1a1a;
+}
+
+.mosaic-item-large .article-image {
+  height: 240px;
+}
+
+.mosaic-item .article-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background-color: #121212;
+}
+
+.mosaic-item .article-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.mosaic-item-large .article-title {
+  font-size: 1.125rem;
+}
+
+.mosaic-item .article-description {
+  -webkit-line-clamp: 2;
+  color: #b0b0b0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+}
+
+.mosaic-item-large .article-description {
+  -webkit-line-clamp: 3;
+  font-size: 0.9375rem;
+}
+
+/* Стили для текстовых карточек */
+.mosaic-item .article-card.text-only {
+  background-color: #1a1a1a;
+  border-color: #2a2a2a;
+}
+
+.mosaic-item .article-card.text-only:hover {
+  border-color: #3a3a3a;
+}
+
+.mosaic-item .article-card.text-only .article-content {
+  padding: 1.5rem;
+}
+
+.mosaic-item .article-card.text-only .article-title {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  line-height: 1.35;
+}
+
+.mosaic-item-large .article-card.text-only .article-title {
+  font-size: 1.5rem;
+}
+
+.mosaic-item .article-card.text-only .article-description {
+  -webkit-line-clamp: 4;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: #b0b0b0;
+}
+
+.mosaic-item-large .article-card.text-only .article-description {
+  -webkit-line-clamp: 6;
+  font-size: 1rem;
+}
+
+.mosaic-item .article-card.text-only .article-footer {
+  margin-top: auto;
+  padding-top: 0.875rem;
+  border-top: 1px solid #2a2a2a;
+}
+
+.mosaic-item .article-card.text-only .article-date {
+  color: #808080;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.mosaic-item .article-card.text-only .article-link {
+  color: #4a9eff;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.mosaic-item .article-card.text-only .article-link:hover {
+  color: #6fb1ff;
+} 
