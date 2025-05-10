@@ -12,8 +12,8 @@ npm install
 
 3. Создайте файл `.env.local` и добавьте следующие переменные окружения:
 ```
-NEXT_PUBLIC_SUPABASE_URL=https://ludczplmylawdxprzymw.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGci
+NEXT_PUBLIC_SUPABASE_URL=https://bobus.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=Amogus
 ```
 
 ## Запуск
