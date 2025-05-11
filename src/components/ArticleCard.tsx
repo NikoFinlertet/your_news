@@ -14,7 +14,8 @@ export function ArticleCard({ article }: ArticleCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
 
-  const handleCardClick = () => {
+  const handleCardClick = (e: React.MouseEvent) => {
+    e.preventDefault();
     setIsModalOpen(true);
   };
 
@@ -27,7 +28,8 @@ export function ArticleCard({ article }: ArticleCardProps) {
         tabIndex={0}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
-            handleCardClick();
+            e.preventDefault();
+            handleCardClick(e as unknown as React.MouseEvent);
           }
         }}
       >
