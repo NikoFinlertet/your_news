@@ -14,12 +14,12 @@ interface ArticleModalProps {
 // Мемоизированный компонент для содержимого модального окна
 const ModalContent = memo(({ article }: { article: Article }) => {
   const formattedDate = useMemo(() => 
-    new Date(article.published_at).toLocaleDateString('ru-RU', {
+    new Date(article.created_at).toLocaleDateString('ru-RU', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     }), 
-    [article.published_at]
+    [article.created_at]
   );
 
   return (
@@ -49,24 +49,7 @@ const ModalContent = memo(({ article }: { article: Article }) => {
           </div>
         )}
         <div className="modal-content-wrapper">
-          <p className="modal-description">{article.description}</p>
-          <div className="modal-content">
-            {article.content.split('\n').map((paragraph, index) => (
-              <p key={index} className="modal-paragraph">
-                {paragraph}
-              </p>
-            ))}
-          </div>
-          <div className="modal-actions">
-            <a 
-              href={article.url} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="modal-link"
-            >
-              Читать далее
-            </a>
-          </div>
+          <p className="modal-description">{article.content}</p>
         </div>
       </div>
     </>
@@ -81,15 +64,15 @@ export function ArticleModal({ article, isOpen, onClose }: ArticleModalProps) {
       try {
         await navigator.share({
           title: article.title,
-          text: article.description,
-          url: article.url,
+          text: article.snippet,
+          url: article.source_url,
         });
       } catch (error) {
         console.error('Ошибка при попытке поделиться:', error);
       }
     } else {
       // Fallback для браузеров без поддержки Web Share API
-      navigator.clipboard.writeText(article.url);
+      navigator.clipboard.writeText(article.source_url);
       alert('Ссылка скопирована в буфер обмена');
     }
   };

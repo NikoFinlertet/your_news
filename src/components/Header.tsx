@@ -49,9 +49,9 @@ export function Header({ articles = [], onTagSelect, selectedTags = [] }: Header
               Войти
             </button>
           )}
+
         </div>
       </div>
-
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
@@ -59,3 +59,7 @@ export function Header({ articles = [], onTagSelect, selectedTags = [] }: Header
     </header>
   );
 } 
+
+/*
+
+*/

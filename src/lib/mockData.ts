@@ -1,78 +1,35 @@
 import { Article, Dashboard } from '@/lib/types';
+export type { Article, Dashboard };
 
 export const mockArticles: Article[] = [
   {
     id: '1',
     title: 'Крупное обновление в мире технологий',
     snippet: 'Компания Apple представила новую линейку продуктов...',
-    description: 'Компания Apple представила новую линейку продуктов с революционными функциями...',
-    content: 'Компания Apple представила новую линейку продуктов...',
-    source: 'TechCrunch',
-    url: 'https://techcrunch.com/article1',
+    content: 'Компания Apple представила новую линейку продуктов с революционными функциями...',
+    source_url: 'https://techcrunch.com/article1',
     image_url: 'https://picsum.photos/800/400?random=1',
-    published_at: '2024-03-20T10:00:00Z',
     created_at: '2024-03-20T10:00:00Z',
-    updated_at: '2024-03-20T10:00:00Z',
-    dashboard_key: 'tech',
-    category: 'technology',
-    sentiment: 'positive',
-    summary: 'Apple представила новые продукты с революционными функциями...',
-    keywords: ['apple', 'technology', 'innovation'],
-    author: 'John Doe',
-    reading_time: 5,
-    views: 1500,
-    likes: 120,
-    comments: 45,
-    shares: 30,
     tags: ['Технологии', 'Apple', 'Инновации']
   },
   {
     id: '2',
     title: 'Новые тренды в мировой экономике',
     snippet: 'Эксперты прогнозируют значительные изменения в мировой экономике...',
-    description: 'Анализ текущих экономических трендов и прогнозы на будущее...',
     content: 'Эксперты прогнозируют значительные изменения в мировой экономике...',
-    source: 'Bloomberg',
-    url: 'https://bloomberg.com/article2',
+    source_url: 'https://bloomberg.com/article2',
     image_url: 'https://picsum.photos/800/400?random=2',
-    published_at: '2024-03-19T15:30:00Z',
     created_at: '2024-03-19T15:30:00Z',
-    updated_at: '2024-03-19T15:30:00Z',
-    dashboard_key: 'economy',
-    category: 'economy',
-    sentiment: 'neutral',
-    summary: 'Анализ текущих экономических трендов и прогнозы на будущее...',
-    keywords: ['economy', 'trends', 'forecast'],
-    author: 'Jane Smith',
-    reading_time: 7,
-    views: 2300,
-    likes: 180,
-    comments: 65,
-    shares: 42,
     tags: ['Экономика', 'Тренды', 'Прогнозы']
   },
   {
     id: '3',
     title: 'Прорыв в медицинских исследованиях',
     snippet: 'Ученые объявили о важном открытии в области лечения рака...',
-    description: 'Новое исследование открывает перспективы в лечении онкологических заболеваний...',
     content: 'Ученые объявили о важном открытии в области лечения рака...',
-    source: 'Nature',
-    url: 'https://nature.com/article3',
-    published_at: '2024-03-18T09:15:00Z',
+    source_url: 'https://nature.com/article3',
+    image_url: 'https://picsum.photos/800/400?random=3',
     created_at: '2024-03-18T09:15:00Z',
-    updated_at: '2024-03-18T09:15:00Z',
-    dashboard_key: 'health',
-    category: 'health',
-    sentiment: 'positive',
-    summary: 'Новое исследование открывает перспективы в лечении онкологических заболеваний...',
-    keywords: ['medicine', 'cancer', 'research'],
-    author: 'Dr. Sarah Johnson',
-    reading_time: 6,
-    views: 3100,
-    likes: 250,
-    comments: 89,
-    shares: 56,
     tags: ['Медицина', 'Исследования', 'Здоровье']
   },
   {
@@ -382,13 +339,9 @@ export const mockArticles: Article[] = [
 export const mockDashboard: Dashboard = {
   id: '1',
   key: 'd_20250505165211_9',
-  title: 'Новостной дашборд',
-  description: 'Агрегация новостей из различных источников',
   created_at: '2024-05-05T16:52:11Z',
-  updated_at: '2024-05-05T16:52:11Z',
-  article_ids: ['1', '2', '3'],
-  is_public: true,
-  user_id: null
+  articles: ['1', '2', '3'],
+  public: true
 };
 
 // Функция для получения случайной статьи
@@ -403,30 +356,5 @@ export const getRandomDashboard = (): Dashboard => {
 
 // Функция для получения статей по дашборду
 export const getArticlesByDashboard = (dashboard: Dashboard): Article[] => {
-  return mockArticles.filter(article => dashboard.article_ids.includes(article.id));
+  return mockArticles.filter(article => dashboard.articles.includes(article.id));
 };
-
-export const mockDashboards: Dashboard[] = [
-  {
-    id: '1',
-    key: 'public',
-    title: 'Общедоступный дашборд',
-    description: 'Основные новости дня',
-    is_public: true,
-    user_id: null,
-    article_ids: ['1', '2', '3'],
-    created_at: '2024-03-20T00:00:00Z',
-    updated_at: '2024-03-20T00:00:00Z'
-  },
-  {
-    id: '2',
-    key: 'personal',
-    title: 'Персональный дашборд',
-    description: 'Подборка новостей по интересам',
-    is_public: false,
-    user_id: 'user-123',
-    article_ids: ['1', '2'],
-    created_at: '2024-03-20T00:00:00Z',
-    updated_at: '2024-03-20T00:00:00Z'
-  }
-]; 

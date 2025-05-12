@@ -1,12 +1,6 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { ArticleCard } from '@/components/ArticleCard';
-import { Footer } from '@/components/Footer';
-import { getDashboardData } from '@/lib/dataProvider';
-import { getArticlesByDashboard } from '@/lib/mockData';
-import { Article } from '@/lib/types';
-import '@/styles/components/Main.css';
+import { getDashboardData, getArticles } from '@/lib/dataProvider';
+import Mosaic from '@/components/Mosaic';
+import { Header } from '@/components/Header';
 
 interface PageProps {
   params: {
@@ -14,58 +8,27 @@ interface PageProps {
   };
 }
 
-export default function DashboardPage({ params }: PageProps) {
-  const [allArticles, setAllArticles] = useState<Article[]>([]);
-  const [filteredArticles, setFilteredArticles] = useState<Article[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [dashboard, setDashboard] = useState<any>(null);
-
-  useEffect(() => {
-    const loadData = async () => {
-      const dashboardData = await getDashboardData(params.key);
-      if (dashboardData) {
-        setDashboard(dashboardData);
-        const articles = getArticlesByDashboard(dashboardData);
-        setAllArticles(articles);
-        setFilteredArticles(articles);
-      }
-      setIsLoading(false);
-    };
-    loadData();
-  }, [params.key]);
-
-  if (isLoading) {
+export default async function DashboardPage({ params }: PageProps) {
+  console.log('Dashboard key from URL:', params.key);
+  
+  const dashboard = await getDashboardData(params.key);
+  console.log('Dashboard data:', dashboard);
+  
+  if (!dashboard) {
     return (
-      <div className="main">
-        <div className="main-container">
-          <h1>Загрузка...</h1>
-        </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-gray-500">Дашборд не найден</p>
       </div>
     );
   }
 
-  if (!dashboard || allArticles.length === 0) {
-    return (
-      <div className="main">
-        <div className="main-container">
-          <h1>Дашборд не найден</h1>
-        </div>
-      </div>
-    );
-  }
+  const articles = await getArticles(dashboard);
+  console.log('Articles:', articles);
 
   return (
-    <>
-      <main className="main">
-        <div className="main-container">
-          <div className="articles-grid">
-            {filteredArticles.map((article) => (
-              <ArticleCard key={article.id} article={article} />
-            ))}
-          </div>
-        </div>
-      </main>
-      <Footer />
-    </>
+    <main className="min-h-screen bg-black">
+      <Header articles={articles} />
+      <Mosaic articles={articles} />
+    </main>
   );
 } 

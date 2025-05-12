@@ -43,13 +43,10 @@ export default function Mosaic({ articles }: MosaicProps) {
               )}
               <div className="article-content">
                 <h2 className="article-title">{article.title}</h2>
-                <p className="article-description">{article.description}</p>
+                <p className="article-description">{article.snippet}</p>
                 <div className="article-meta">
-                  {article.author && (
-                    <span className="article-author">{article.author}</span>
-                  )}
                   <span className="article-date">
-                    {new Date(article.published_at).toLocaleDateString()}
+                    {new Date(article.created_at).toLocaleDateString()}
                   </span>
                 </div>
               </div>

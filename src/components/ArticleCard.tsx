@@ -49,19 +49,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
         )}
         <div className="article-content">
           <h2 className="article-title">{article.title}</h2>
-          <p className="article-description">{article.description}</p>
-          <div className="article-footer">
-            <span className="article-date">
-              {new Date(article.published_at).toLocaleDateString('ru-RU', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}
-            </span>
-            <span className="article-link">
-              Подробнее
-            </span>
-          </div>
+          <p className="article-description">{article.snippet}</p>
         </div>
       </div>
 

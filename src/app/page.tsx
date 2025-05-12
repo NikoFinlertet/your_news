@@ -1,5 +1,4 @@
 import { mockArticles } from '../lib/mockData';
-import { Article } from '../lib/types';
 import HomeClient from './HomeClient';
 
 async function getArticles() {

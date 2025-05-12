@@ -1,18 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Article } from '../lib/types';
 import Mosaic from '../components/Mosaic';
 import { Header } from '../components/Header';
 import '../styles/components/Main.css';
 import '../styles/components/Mosaic.css';
+import { getArticles } from '../lib/dataProvider';
 
 interface HomeClientProps {
   articles: Article[];
 }
 
-export default function HomeClient({ articles }: HomeClientProps) {
+export default function HomeClient({ articles: initialArticles }: HomeClientProps) {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [articles, setArticles] = useState<Article[]>(initialArticles);
+
+  useEffect(() => {
+    console.log('Initial articles:', initialArticles);
+  }, [initialArticles]);
 
   const filteredArticles = selectedTags.length > 0
     ? articles.filter(article => 
