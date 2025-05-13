@@ -72,8 +72,13 @@ export function ArticleModal({ article, isOpen, onClose }: ArticleModalProps) {
       }
     } else {
       // Fallback для браузеров без поддержки Web Share API
-      navigator.clipboard.writeText(article.source_url);
-      alert('Ссылка скопирована в буфер обмена');
+      const urlToCopy = article.source_url || article.url;
+      if (urlToCopy) {
+        navigator.clipboard.writeText(urlToCopy);
+        alert('Ссылка скопирована в буфер обмена');
+      } else {
+        alert('Ссылка недоступна');
+      }
     }
   };
 

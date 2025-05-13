@@ -3,7 +3,7 @@
 import { useRef, useEffect } from 'react';
 import { User } from '@supabase/supabase-js';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import styles from '../styles/components/UserMenu.css';
+import styles from '../styles/components/UserMenu.module.css';
 
 interface UserMenuProps {
   user: User;
