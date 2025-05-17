@@ -8,12 +8,12 @@ import { TagsMenu } from './TagsMenu';
 import '../styles/components/Header.css';
 
 interface HeaderProps {
-  articles?: any[];
+  news?: any[];
   onTagSelect?: (tags: string[]) => void;
   selectedTags?: string[];
 }
 
-export function Header({ articles = [], onTagSelect, selectedTags = [] }: HeaderProps) {
+export function Header({ news = [], onTagSelect, selectedTags = [] }: HeaderProps) {
   const { user } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -28,9 +28,9 @@ export function Header({ articles = [], onTagSelect, selectedTags = [] }: Header
           </p>
         </div>
         <div className="header-actions">
-          {articles.length > 0 && (
+          {news.length > 0 && (
             <TagsMenu
-              articles={articles}
+              articles={news}
               selectedTags={selectedTags}
               onTagSelect={onTagSelect}
             />

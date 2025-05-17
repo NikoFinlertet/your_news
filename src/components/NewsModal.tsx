@@ -1,55 +1,36 @@
 'use client';
 
 import { useEffect, useMemo, memo } from 'react';
-import Image from 'next/image';
 import { News } from '@/lib/types';
 import '@/styles/components/ArticleModal.css';
 
-interface ArticleModalProps {
-  article: News;
+interface NewsModalProps {
+  news: News;
   isOpen: boolean;
   onClose: () => void;
 }
 
 // Мемоизированный компонент для содержимого модального окна
-const ModalContent = memo(({ article }: { article: News }) => {
+const ModalContent = memo(({ news }: { news: News }) => {
   const formattedDate = useMemo(() => 
-    new Date(article.created_at).toLocaleDateString('ru-RU', {
+    new Date(news.created_at).toLocaleDateString('ru-RU', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     }), 
-    [article.created_at]
+    [news.created_at]
   );
 
   return (
     <>
       <div className="modal-header">
-        <h2 className="modal-title">{article.title}</h2>
+        <h2 className="modal-title">{news.title}</h2>
         <span className="modal-date">{formattedDate}</span>
       </div>
 
       <div className="modal-body">
-        {article.image_url && (
-          <div className="modal-image-wrapper">
-            <Image
-              src={article.image_url}
-              alt={article.title}
-              width={800}
-              height={400}
-              className="modal-image"
-              priority
-              quality={85}
-              sizes="(max-width: 768px) 100vw, 800px"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-              }}
-            />
-          </div>
-        )}
         <div className="modal-content-wrapper">
-          <p className="modal-description">{article.content}</p>
+          <p className="modal-description">{news.text}</p>
         </div>
       </div>
     </>
@@ -58,19 +39,20 @@ const ModalContent = memo(({ article }: { article: News }) => {
 
 ModalContent.displayName = 'ModalContent';
 
-export function ArticleModal({ article, isOpen, onClose }: ArticleModalProps) {
+export function NewsModal({ news, isOpen, onClose }: NewsModalProps) {
   const handleShare = async () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: article.title,
-          text: article.snippet,
-          url: article.source_url,
+          title: news.title,
+          text: news.text,
+          //url: article.source_url,
         });
       } catch (error) {
         console.error('Ошибка при попытке поделиться:', error);
       }
     } else {
+      /*
       // Fallback для браузеров без поддержки Web Share API
       const urlToCopy = article.source_url || article.url;
       if (urlToCopy) {
@@ -79,6 +61,7 @@ export function ArticleModal({ article, isOpen, onClose }: ArticleModalProps) {
       } else {
         alert('Ссылка недоступна');
       }
+      */
     }
   };
 
@@ -143,7 +126,7 @@ export function ArticleModal({ article, isOpen, onClose }: ArticleModalProps) {
           </button>
         </div>
         
-        <ModalContent article={article} />
+        <ModalContent news={news} />
       </div>
     </div>
   );

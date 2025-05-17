@@ -24,11 +24,9 @@ export async function getDigestData(user_id: string): Promise<Digest | null> {
     const { data, error } = await supabase
       .from('digests')
       .select('*')
-      .eq('user_id', user_id as unknown as string);
-      //.order('created_at', { ascending: false })
-      //.limit(1);
-
-      console.log('Query result:', data); // Проверим результат
+      .eq('user_id', user_id as unknown as string)
+      .order('created_at', { ascending: false })
+      .limit(1);
 
     if (error) {
       console.error('Supabase error:', error);
@@ -70,7 +68,7 @@ export async function getNews(news_ids: string[]): Promise<News[]> {
     const { data, error } = await supabase
       .from('personal_news')
       .select('*')
-      .eq('id', news_ids);
+      .in('id', news_ids);
 
     if (error) throw error;
 

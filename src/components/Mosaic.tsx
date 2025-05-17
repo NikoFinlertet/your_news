@@ -1,54 +1,50 @@
 'use client';
 
 import { useState } from 'react';
-import { Article } from '@/lib/types';
+import { News } from '@/lib/types';
 import Link from 'next/link';
-import Image from 'next/image';
-import { ArticleModal } from './ArticleModal';
+import { NewsModal } from './NewsModal';
 import '@/styles/components/Mosaic.css';
+import Unauthorized from './Unauthorized';
+import { Header } from './Header';
 
 
 interface MosaicProps {
-  articles: Article[];
+  news_arr: News[];
 }
 
 
-export default function Mosaic({ articles }: MosaicProps) {
-  const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+export default function Mosaic({ news_arr }: MosaicProps) {
+  const [selectedNews, setSelectedNews] = useState<News | null>(null);
 
-  const handleCardClick = (e: React.MouseEvent, article: Article) => {
+  const handleCardClick = (e: React.MouseEvent, news: News) => {
     e.preventDefault();
     e.stopPropagation();
-    setSelectedArticle(article);
+    setSelectedNews(news);
   };
+
+  if (!news_arr || news_arr.length === 0) {
+    return(<Unauthorized/>);
+  }
 
   return (
     <>
+      <Header/>
       <div className="mosaic">
-        {articles.map((article) => (
+        {news_arr.map((item) => (
           <Link
-            href={`/article/${article.id}`}
-            key={article.id}
+            href={`/news/${item.id}`}
+            key={item.id}
             className="mosaic-item"
-            onClick={(e) => handleCardClick(e, article)}
+            onClick={(e) => handleCardClick(e, item)}
           >
             <div className="article-card">
-              {article.image_url && (
-                <div className="article-image">
-                  <Image
-                    src={article.image_url}
-                    alt={article.title}
-                    fill
-                    style={{ objectFit: 'cover' }}
-                  />
-                </div>
-              )}
               <div className="article-content">
-                <h2 className="article-title">{article.title}</h2>
-                <p className="article-description">{article.snippet}</p>
+                <h2 className="article-title">{item.title}</h2>
+                <p className="article-description">{item.summary}</p>
                 <div className="article-meta">
                   <span className="article-date">
-                    {new Date(article.created_at).toLocaleDateString()}
+                    {new Date(item.created_at).toLocaleDateString()}
                   </span>
                 </div>
               </div>
@@ -57,11 +53,11 @@ export default function Mosaic({ articles }: MosaicProps) {
         ))}
       </div>
 
-      {selectedArticle && (
-        <ArticleModal
-          article={selectedArticle}
+      {selectedNews && (
+        <NewsModal
+          news={selectedNews}
           isOpen={true}
-          onClose={() => setSelectedArticle(null)}
+          onClose={() => setSelectedNews(null)}
         />
       )}
     </>
