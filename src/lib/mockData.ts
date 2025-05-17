@@ -1,6 +1,21 @@
+/**
+ * Модуль с моковыми данными для тестирования и разработки
+ * Содержит тестовые статьи и дашборды
+ */
+
 import { Article, Dashboard } from '@/lib/types';
 export type { Article, Dashboard };
 
+/**
+ * Массив тестовых статей
+ * Каждая статья содержит полную информацию о новости, включая:
+ * - Заголовок
+ * - Краткое описание
+ * - Полный контент
+ * - URL источника
+ * - Изображение
+ * - Метаданные (даты, теги и т.д.)
+ */
 export const mockArticles: Article[] = [
   {
     id: '1',
@@ -336,6 +351,15 @@ export const mockArticles: Article[] = [
   }
 ];
 
+/**
+ * Массив тестовых дашбордов
+ * Каждый дашборд содержит:
+ * - Уникальный ключ
+ * - Название
+ * - Описание
+ * - Список ID статей
+ * - Метаданные (даты создания/обновления)
+ */
 export const mockDashboard: Dashboard = {
   id: '1',
   key: 'd_20250505165211_9',
@@ -344,17 +368,27 @@ export const mockDashboard: Dashboard = {
   public: true
 };
 
-// Функция для получения случайной статьи
+/**
+ * Генерирует случайную статью из массива mockArticles
+ * @returns Случайная статья
+ */
 export const getRandomArticle = (): Article => {
   return mockArticles[Math.floor(Math.random() * mockArticles.length)];
 };
 
-// Функция для получения случайного дашборда
+/**
+ * Генерирует случайный дашборд из массива mockDashboards
+ * @returns Случайный дашборд
+ */
 export const getRandomDashboard = (): Dashboard => {
   return mockDashboard;
 };
 
-// Функция для получения статей по дашборду
+/**
+ * Получает список статей для конкретного дашборда
+ * @param dashboard - Дашборд, для которого нужно получить статьи
+ * @returns Массив статей, принадлежащих данному дашборду
+ */
 export const getArticlesByDashboard = (dashboard: Dashboard): Article[] => {
   return mockArticles.filter(article => dashboard.articles.includes(article.id));
 };

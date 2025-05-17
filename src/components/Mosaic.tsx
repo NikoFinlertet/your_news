@@ -7,9 +7,11 @@ import Image from 'next/image';
 import { ArticleModal } from './ArticleModal';
 import '@/styles/components/Mosaic.css';
 
+
 interface MosaicProps {
   articles: Article[];
 }
+
 
 export default function Mosaic({ articles }: MosaicProps) {
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);

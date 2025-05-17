@@ -2,17 +2,17 @@
 
 import { useEffect, useMemo, memo } from 'react';
 import Image from 'next/image';
-import { Article } from '@/lib/types';
+import { News } from '@/lib/types';
 import '@/styles/components/ArticleModal.css';
 
 interface ArticleModalProps {
-  article: Article;
+  article: News;
   isOpen: boolean;
   onClose: () => void;
 }
 
 // Мемоизированный компонент для содержимого модального окна
-const ModalContent = memo(({ article }: { article: Article }) => {
+const ModalContent = memo(({ article }: { article: News }) => {
   const formattedDate = useMemo(() => 
     new Date(article.created_at).toLocaleDateString('ru-RU', {
       year: 'numeric',
