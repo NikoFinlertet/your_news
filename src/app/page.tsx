@@ -1,11 +1,14 @@
-import { mockArticles } from '../lib/mockData';
-import HomeClient from './HomeClient';
+import { Header } from "@/components/Header";
 
-async function getArticles() {
-  return mockArticles;
-}
 
 export default async function Home() {
-  const allArticles = await getArticles();
-  return <HomeClient articles={allArticles} />;
-} 
+  return(
+    <>
+      <Header/>
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-2xl">unauthorized</p>
+    </div>
+    </>
+  );
+}
+  
