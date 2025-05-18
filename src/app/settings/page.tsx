@@ -1,11 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { ChangeEventHandler, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { getSources } from '@/lib/dataProvider';
 
 // Mock server actions
 const updateAboutYou = async (data: { about: string }) => {
   console.log('Updating about you:', data);
+  // Simulate API call
+  await new Promise(resolve => setTimeout(resolve, 1000));
+};
+
+const updateSources = async (data: { sources: string[] }) => {
+  console.log('Updating sources:', data);
   // Simulate API call
   await new Promise(resolve => setTimeout(resolve, 1000));
 };
@@ -42,9 +49,14 @@ const generateInterests = async () => {
 export default function OnboardingPage() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
+  const maxSteps = 3;
   const [profileLink, setProfileLink] = useState('');
   const [about, setAbout] = useState('');
   const [interests, setInterests] = useState<string[]>(['']);
+  const [sources, setSources] = useState<string[]>([]);
+  const [selectedSources, setSelectedSources] = useState<string[]>([]);
+  const [searchSources, setSearchSources] = useState<string>('');
+  const [filteredSources, setFilteredSources] = useState<string[]>([]);
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [selectedHour, setSelectedHour] = useState('09:00');
   const [isLoading, setIsLoading] = useState(false);
@@ -53,6 +65,15 @@ export default function OnboardingPage() {
     'Monday', 'Tuesday', 'Wednesday', 'Thursday',
     'Friday', 'Saturday', 'Sunday'
   ];
+
+  const fetchSources = async () => {
+    const sources = await getSources();
+    setSources(sources);
+    setFilteredSources(sources);
+  }
+
+  if (!sources.length)
+    fetchSources();
 
   const handleChangeIndex = async (index: number) => {
     setIsLoading(true);
@@ -67,6 +88,9 @@ export default function OnboardingPage() {
           await updateInterests({ interests: interests.filter(i => i.trim() !== '') });
           break;
         case 2:
+          await updateSources({ sources: selectedSources });
+          break;
+        case 3:
           await updateTimeSettings({ 
             days: selectedDays,
             hour: selectedHour
@@ -86,18 +110,24 @@ export default function OnboardingPage() {
   const handleNext = async () => {
     setIsLoading(true);
     try {
-      if (currentStep === 0) {
-        setAbout(await updateProfileLink({ link: profileLink }));
-        await updateAboutYou({ about });
-      } else if (currentStep === 1) {
-        await updateInterests({ interests: interests.filter(i => i.trim() !== '') });
-      } else if (currentStep === 2) {
-        await updateTimeSettings({ 
-          days: selectedDays,
-          hour: selectedHour
-        });
-        router.push('/');
-        return;
+      switch (currentStep) {
+        case 0:
+          setAbout(await updateProfileLink({ link: profileLink }));
+          await updateAboutYou({ about });
+          break;
+        case 1:
+          await updateInterests({ interests: interests.filter(i => i.trim() !== '') });
+          break;
+        case 2:
+          await updateSources({ sources: selectedSources });
+          break;
+        case 3:
+          await updateTimeSettings({ 
+            days: selectedDays,
+            hour: selectedHour
+          });
+          router.push('/');
+          return;
       }
       setCurrentStep(prev => prev + 1);
     } catch (error) {
@@ -108,7 +138,7 @@ export default function OnboardingPage() {
   };
 
   const handleBack = () => {
-    setCurrentStep(prev => prev - 1);
+    handleChangeIndex(currentStep - 1);
   };
 
   const handleProfileLinkSubmit = async () => {
@@ -156,6 +186,11 @@ export default function OnboardingPage() {
     }
   };
 
+  const handleSearchSources: ChangeEventHandler<HTMLInputElement> = (event) => {
+    setSearchSources(event.target.value);
+    event.target.value ? setFilteredSources(sources.filter(s => s.toLowerCase().includes(event.target.value.toLowerCase()))) : setFilteredSources(sources);
+  }
+
   const toggleDay = (day: string) => {
     setSelectedDays(prev => 
       prev.includes(day) 
@@ -164,12 +199,20 @@ export default function OnboardingPage() {
     );
   };
 
+  const toggleSrc = (src: string) => {
+    setSelectedSources(prev => 
+      prev.includes(src) 
+        ? prev.filter(s => s !== src)
+        : [...prev, src]
+    );
+  };
+
   return (
     <main className="min-h-screen flex items-center justify-center">
       <div className="flex flex-col w-[640px] rounded-2xl p-8 border border-gray-200 shadow-lg">
         <div className="mb-8">
           <div className="flex justify-between mb-4">
-            {['О себе', 'Интересы', 'Время дайджеста'].map((step, index) => (
+            {['О себе', 'Интересы', 'Источники', 'Время дайджеста'].map((step, index) => (
               <div
                 key={step}
                 className={`flex items-center ${
@@ -257,6 +300,27 @@ export default function OnboardingPage() {
 
           {currentStep === 2 && (
             <div className="space-y-4">
+              <h2 className="text-2xl font-bold text-gray-300 mb-2">Какие источники вас интересуют?</h2>
+              <input type="text" value={searchSources} onChange={handleSearchSources} placeholder='Поиск...' className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+              <div className="grid grid-cols-2 gap-4">
+                {filteredSources.map(src => (
+                  <div key={src} className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      id={src}
+                      checked={selectedSources.includes(src)}
+                      onChange={() => toggleSrc(src)}
+                      className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <label htmlFor={src} className="text-gray-400">{src}</label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {currentStep === 3 && (
+            <div className="space-y-4">
               <h2 className="text-2xl font-bold text-gray-300 mb-2">Когда вы хотите получать новости?</h2>
               <div className="grid grid-cols-2 gap-4">
                 {weekDays.map(day => (
@@ -284,7 +348,7 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          <div className="flex justify-between mt-8">
+          <div className="flex justify-between mt-16">
             {currentStep > 0 && (
               <button
                 onClick={handleBack}
@@ -299,7 +363,7 @@ export default function OnboardingPage() {
               className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors ml-auto disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isLoading}
             >
-              {isLoading ? 'Loading...' : currentStep === 2 ? 'Finish' : 'Next'}
+              {isLoading ? 'Loading...' : currentStep === maxSteps ? 'Finish' : 'Next'}
             </button>
           </div>
         </div>
