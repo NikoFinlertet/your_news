@@ -16,6 +16,7 @@ interface MosaicProps {
 
 export default function Mosaic({ news_arr }: MosaicProps) {
   const [selectedNews, setSelectedNews] = useState<News | null>(null);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const handleCardClick = (e: React.MouseEvent, news: News) => {
     e.preventDefault();
@@ -23,15 +24,29 @@ export default function Mosaic({ news_arr }: MosaicProps) {
     setSelectedNews(news);
   };
 
+  const handleTagSelect = (tags: string[]) => {
+    setSelectedTags(tags);
+  };
+
   if (!news_arr || news_arr.length === 0) {
     return(<Unauthorized/>);
   }
 
+  const filteredNews = selectedTags.length > 0 
+    ? news_arr.filter(news => 
+        selectedTags.every(tag => news.ai_tags?.includes(tag))
+      )
+    : news_arr;
+
   return (
     <>
-      <Header/>
+      <Header 
+        news={news_arr}
+        selectedTags={selectedTags}
+        onTagSelect={handleTagSelect}
+      />
       <div className="mosaic">
-        {news_arr.map((item) => (
+        {filteredNews.map((item) => (
           <Link
             href={`/news/${item.id}`}
             key={item.id}
@@ -40,7 +55,7 @@ export default function Mosaic({ news_arr }: MosaicProps) {
           >
             <div className="article-card">
               <div className="article-content">
-                <h2 className="article-title">{item.title}</h2>
+                <h2 className="article-title">{item.ai_title}</h2>
                 <p className="article-description">{item.summary}</p>
                 <div className="article-meta">
                   <span className="article-date">

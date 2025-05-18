@@ -15,7 +15,7 @@
 
 /* Главная новость */
 .mosaic-item:first-child {
-  grid-column: span 8;
+  grid-column: span 6;
   grid-row: span 2;
 }
 
@@ -23,24 +23,18 @@
   height: 100%;
 }
 
-.mosaic-item:first-child .article-image {
-  height: 400px;
-}
-
 .mosaic-item:first-child .article-title {
-  font-size: 2rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0px;
 }
 
 .mosaic-item:first-child .article-description {
-  font-size: 1.125rem;
   -webkit-line-clamp: 4;
 }
 
 /* Второстепенные новости */
 .mosaic-item:nth-child(2),
 .mosaic-item:nth-child(3) {
-  grid-column: span 4;
+  grid-column: span 3;
 }
 
 .mosaic-item:nth-child(2) .article-image,
@@ -55,7 +49,8 @@
 
 .article-card {
   background: #121212;
-  border-radius: 4px;
+  border-radius: 30px;
+  gap: 20px;
   overflow: hidden;
   transition: transform 0.2s ease;
   height: 100%;
@@ -68,13 +63,6 @@
   transform: translateY(-2px);
 }
 
-.article-image {
-  position: relative;
-  width: 100%;
-  height: 200px;
-  background-color: #1a1a1a;
-}
-
 .article-content {
   padding: 1rem;
   flex-grow: 1;
@@ -84,19 +72,23 @@
 }
 
 .article-title {
-  font-size: 1.125rem;
+  font-size: 20px;
   font-weight: 600;
-  margin-bottom: 0.5rem;
-  line-height: 1.4;
+  letter-spacing: 0%;
+  line-height: 125%;
   color: #ffffff;
+  vertical-align: middle;
 }
 
 .article-description {
-  font-size: 0.875rem;
+  font-size: 16px;
+  font-weight: 400;
   color: #b0b0b0;
   margin-bottom: 0.75rem;
+  letter-spacing: 0%;
   line-height: 1.5;
   -webkit-line-clamp: 2;
+  vertical-align: middle;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   overflow: hidden;
@@ -111,56 +103,6 @@
   color: #808080;
 }
 
-/* Адаптивность */
-@media (max-width: 1200px) {
-  .mosaic {
-    grid-template-columns: repeat(8, 1fr);
-  }
-  
-  .mosaic-item:first-child {
-    grid-column: span 8;
-  }
-  
-  .mosaic-item:nth-child(2),
-  .mosaic-item:nth-child(3) {
-    grid-column: span 4;
-  }
-  
-  .mosaic-item:not(:first-child):not(:nth-child(2)):not(:nth-child(3)) {
-    grid-column: span 4;
-  }
-}
-
-@media (max-width: 768px) {
-  .mosaic {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    padding: 12px;
-  }
-  
-  .mosaic-item:first-child,
-  .mosaic-item:nth-child(2),
-  .mosaic-item:nth-child(3),
-  .mosaic-item:not(:first-child):not(:nth-child(2)):not(:nth-child(3)) {
-    grid-column: span 4;
-  }
-  
-  .mosaic-item:first-child .article-image {
-    height: 300px;
-  }
-  
-  .mosaic-item:first-child .article-title {
-    font-size: 1.5rem;
-  }
-  
-  .article-title {
-    font-size: 1rem;
-  }
-  
-  .article-description {
-    font-size: 0.8125rem;
-  }
-}
 
 /* Стили для карточек в мозаике */
 .mosaic-item .article-card {

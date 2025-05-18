@@ -18,6 +18,6 @@ export interface News{
   user_id: string;
   summary: string;
   text: string;
-  title: string;
-  tags: string[];
+  ai_title: string;
+  ai_tags: string[];
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, memo } from 'react';
 import { News } from '@/lib/types';
-import '@/styles/components/ArticleModal.css';
+import '@/styles/components/NewsModal.css';
 
 interface NewsModalProps {
   news: News;
@@ -21,16 +21,23 @@ const ModalContent = memo(({ news }: { news: News }) => {
     [news.created_at]
   );
 
+  // Разбиваем текст на параграфы по двойному переносу строки
+  const paragraphs = news.text.split('\n\n').filter(p => p.trim());
+
   return (
     <>
       <div className="modal-header">
-        <h2 className="modal-title">{news.title}</h2>
         <span className="modal-date">{formattedDate}</span>
+        <h2 className="modal-title">{news.ai_title}</h2>
       </div>
 
       <div className="modal-body">
         <div className="modal-content-wrapper">
-          <p className="modal-description">{news.text}</p>
+          {paragraphs.map((paragraph, index) => (
+            <p key={index} className="modal-paragraph">
+              {paragraph}
+            </p>
+          ))}
         </div>
       </div>
     </>
@@ -44,7 +51,7 @@ export function NewsModal({ news, isOpen, onClose }: NewsModalProps) {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: news.title,
+          title: news.ai_title,
           text: news.text,
           //url: article.source_url,
         });

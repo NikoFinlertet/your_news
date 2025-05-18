@@ -1,7 +1,5 @@
 import { getDigestData, getDigestNews, getNews } from '@/lib/dataProvider';
 import Mosaic from '@/components/Mosaic';
-import { Header } from '@/components/Header';
-import Unauthorized from '@/components/Unauthorized';
 
 
 interface PageProps {

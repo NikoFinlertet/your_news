@@ -30,7 +30,7 @@ export function Header({ news = [], onTagSelect, selectedTags = [] }: HeaderProp
         <div className="header-actions">
           {news.length > 0 && (
             <TagsMenu
-              articles={news}
+              news_arr={news}
               selectedTags={selectedTags}
               onTagSelect={onTagSelect}
             />
