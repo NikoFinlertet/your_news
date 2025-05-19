@@ -1,4 +1,3 @@
-
 export interface Digest{
   id: string;
   created_at: string;
@@ -20,4 +19,16 @@ export interface News{
   text: string;
   ai_title: string;
   ai_tags: string[];
+}
+
+export interface Article {
+  id: string;
+  title: string;
+  content: string;
+  summary?: string;
+  tags?: string[];
+  created_at: string;
+  author?: string;
+  source?: string;
+  url?: string;
 }

@@ -53,7 +53,7 @@ export default function Mosaic({ news_arr }: MosaicProps) {
             className="mosaic-item"
             onClick={(e) => handleCardClick(e, item)}
           >
-            <div className="article-card">
+            <div className="article-card" style={{borderRadius: '20px'}}>
               <div className="article-content">
                 <h2 className="article-title">{item.ai_title}</h2>
                 <p className="article-description">{item.summary}</p>

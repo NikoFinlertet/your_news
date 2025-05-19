@@ -6,7 +6,7 @@ import '../styles/globals.css';
 
 const inter = Inter({ subsets: ['latin', 'cyrillic'] });
 
-export const HeaderData: Metadata = {
+export const metadata: Metadata = {
   title: 'YourNews - Новости и аналитика',
   description: 'Агрегатор новостей и аналитики',
 };
