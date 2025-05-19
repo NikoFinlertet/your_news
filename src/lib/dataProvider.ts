@@ -79,3 +79,23 @@ export async function getNews(news_ids: string[]): Promise<News[]> {
     return [];
   }
 } 
+
+export async function getSources(): Promise<string[]> {
+  if (!supabase) return [];
+
+  try {
+    const { data, error } = await supabase
+      .from('sources')
+      .select('title')
+      .eq('indexer_type', 'telegram');
+
+    console.log("Fetched sources: ", data);
+    
+    if (error) throw error;
+
+    return data.map(item => item.title as string);
+  } catch (error) {
+    console.error('Error fetching sources:', error);
+    return [];
+  }
+}
