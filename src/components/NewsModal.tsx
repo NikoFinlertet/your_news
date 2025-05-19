@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, memo } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
 import { News } from '@/lib/types';
 import '@/styles/components/NewsModal.css';
 
@@ -47,28 +48,24 @@ const ModalContent = memo(({ news }: { news: News }) => {
 ModalContent.displayName = 'ModalContent';
 
 export function NewsModal({ news, isOpen, onClose }: NewsModalProps) {
+  const flag_popup = true;
   const handleShare = async () => {
     if (navigator.share) {
       try {
         await navigator.share({
           title: news.ai_title,
           text: news.text,
-          //url: article.source_url,
         });
       } catch (error) {
         console.error('Ошибка при попытке поделиться:', error);
       }
     } else {
-      /*
-      // Fallback для браузеров без поддержки Web Share API
-      const urlToCopy = article.source_url || article.url;
-      if (urlToCopy) {
-        navigator.clipboard.writeText(urlToCopy);
-        alert('Ссылка скопирована в буфер обмена');
-      } else {
-        alert('Ссылка недоступна');
+      //Triger tuta
+      const newsToCopy = news.ai_title + news.text;
+      if (newsToCopy) {
+        navigator.clipboard.writeText(newsToCopy);
+        toast.success('Скопировано в буфер обмена');
       }
-      */
     }
   };
 
@@ -135,6 +132,10 @@ export function NewsModal({ news, isOpen, onClose }: NewsModalProps) {
         
         <ModalContent news={news} />
       </div>
+      <Toaster toastOptions={{style: {
+      color: '#ffffff',
+      backgroundColor: '#222222',
+    },}}/>
     </div>
   );
 } 

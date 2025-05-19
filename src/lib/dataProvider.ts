@@ -72,7 +72,6 @@ export async function getNews(news_ids: string[]): Promise<News[]> {
 
     if (error) throw error;
 
-    // Фильтруем только статьи, которые принадлежат данному дашборду
     return data as News[];
   } catch (error) {
     console.error('Error fetching news:', error);
