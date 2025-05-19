@@ -8,18 +8,29 @@ import { getSources } from '@/lib/dataProvider';
 const updateAboutYou = async (data: { about: string }) => {
   console.log('Updating about you:', data);
   // Simulate API call
+  // To supabase ai_profile
   await new Promise(resolve => setTimeout(resolve, 1000));
 };
 
 const updateSources = async (data: { sources: string[] }) => {
   console.log('Updating sources:', data);
   // Simulate API call
+  // To supabase user_sources
   await new Promise(resolve => setTimeout(resolve, 1000));
 };
+
+const generateSources = async () => {
+  console.log('Generating sources');
+  // Simulate API call
+  // /choose_posts_for_user
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  return ['the_holy_bible'];
+}
 
 const updateInterests = async (data: { interests: string[] }) => {
   console.log('Updating interests:', data);
   // Simulate API call
+  // To supabase queries
   await new Promise(resolve => setTimeout(resolve, 1000));
 };
 
@@ -42,6 +53,7 @@ const updateProfileLink = async (data: { link: string }) => {
 const generateInterests = async () => {
   console.log('Generating interests');
   // Simulate API call
+  // /generate_queries
   await new Promise(resolve => setTimeout(resolve, 1000));
   return ['AI', 'ML', 'Machine Learning', 'Deep Learning'];
 }
@@ -191,6 +203,19 @@ export default function OnboardingPage() {
     event.target.value ? setFilteredSources(sources.filter(s => s.toLowerCase().includes(event.target.value.toLowerCase()))) : setFilteredSources(sources);
   }
 
+  const handleGenerateSources = async () => {
+    setIsLoading(true);
+    try {
+      const generatedSources = await generateSources();
+      const sourcesToUpdate = [...selectedSources, ...generatedSources];
+      setSelectedSources(sourcesToUpdate.reduce((acc, cur) => acc.includes(cur) ? acc : [...acc, cur], [] as string[]));
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   const toggleDay = (day: string) => {
     setSelectedDays(prev => 
       prev.includes(day) 
@@ -301,7 +326,15 @@ export default function OnboardingPage() {
           {currentStep === 2 && (
             <div className="space-y-4">
               <h2 className="text-2xl font-bold text-gray-300 mb-2">Какие источники вас интересуют?</h2>
-              <input type="text" value={searchSources} onChange={handleSearchSources} placeholder='Поиск...' className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+              <div className="flex items-center space-x-2">
+                <input type="text" value={searchSources} onChange={handleSearchSources} placeholder='Поиск...' className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                <button
+                  onClick={handleGenerateSources}
+                  className="text-gray-500 px-3 py-3 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M9 13a4.5 4.5 0 0 0 3-4"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M12 13h4"/><path d="M12 18h6a2 2 0 0 1 2 2v1"/><path d="M12 8h8"/><path d="M16 8V5a2 2 0 0 1 2-2"/><circle cx="16" cy="13" r=".5"/><circle cx="18" cy="3" r=".5"/><circle cx="20" cy="21" r=".5"/><circle cx="20" cy="8" r=".5"/></svg>
+                </button>
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 {filteredSources.map(src => (
                   <div key={src} className="flex items-center space-x-3">
@@ -316,6 +349,8 @@ export default function OnboardingPage() {
                   </div>
                 ))}
               </div>
+              {/* add new source */}
+              
             </div>
           )}
 
