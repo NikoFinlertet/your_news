@@ -47,7 +47,8 @@ const updateAboutYou = async (user_id: string, data: { about: string }) => {
   return res;
 };
 
-const updateSources = async (user_id: string, data: { sources: string[] }) => {
+// Here sources are one existing, refered to by title; new_sources are ones to create, refered by link
+const updateSources = async (user_id: string, data: { sources: string[], new_sources: string[] }) => {
   // if (!supabase) {
   //   console.log('Supabase client is not initialized');
   //   return null;
@@ -172,6 +173,7 @@ export default function OnboardingPage() {
   const [selectedSources, setSelectedSources] = useState<string[]>([]);
   const [searchSources, setSearchSources] = useState<string>('');
   const [filteredSources, setFilteredSources] = useState<string[]>([]);
+  const [newSources, setNewSources] = useState<string[]>([]);
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [selectedHour, setSelectedHour] = useState('09:00');
   const [isLoading, setIsLoading] = useState(false);
@@ -224,7 +226,7 @@ export default function OnboardingPage() {
           await updateInterests(userId, { interests: interests.filter(i => i.trim() !== '') });
           break;
         case 2:
-          await updateSources(userId, { sources: selectedSources });
+          await updateSources(userId, { sources: selectedSources, new_sources: newSources.reduce((acc, cur) => acc.includes(cur) ? acc : [...acc, cur], [] as string[]) });
           break;
         case 3:
           console.log(selectedDays, selectedDays.map(day => weekDays[day]));
@@ -258,7 +260,7 @@ export default function OnboardingPage() {
           await updateInterests(userId, { interests: interests.filter(i => i.trim() !== '') });
           break;
         case 2:
-          await updateSources(userId, { sources: selectedSources });
+          await updateSources(userId, { sources: selectedSources, new_sources: newSources.reduce((acc, cur) => acc.includes(cur) ? acc : [...acc, cur], [] as string[]) });
           break;
         case 3:
           await updateTimeSettings(userId, { 
@@ -342,6 +344,26 @@ export default function OnboardingPage() {
     } finally {
       setIsLoading(false);
     }
+  }
+
+  const handleAddSource = () => {
+    setNewSources(prev => [...prev, '']);
+  }
+
+  const updateNewSource = (index: number, value: string) => {
+    setNewSources(prev => {
+      const newSources = [...prev];
+      newSources[index] = value;
+      return newSources;
+    });
+  }
+
+  const handleRemoveSource = (index: number) => {
+    setNewSources(prev => {
+      const newSources = [...prev];
+      newSources.splice(index, 1);
+      return newSources;
+    });
   }
 
   const toggleDay = (day: string) => {
@@ -473,12 +495,35 @@ export default function OnboardingPage() {
                       onChange={() => toggleSrc(src)}
                       className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-500"
                     />
-                    <label htmlFor={src} className="text-gray-400">{src}</label>
+                    <label htmlFor={src} className="text-gray-300 text-lg">{src}</label>
                   </div>
                 ))}
               </div>
-              {/* add new source */}
-              
+              {/* add new sources */}
+              {newSources.map((source, index) => (
+                <div key={index} className="flex items-center space-x-2">
+                  <input
+                    key={index}
+                    type="text"
+                    value={source}
+                    onChange={(e) => updateNewSource(index, e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="t.me/..."
+                  />
+                  <button
+                    onClick={() => handleRemoveSource(index)}
+                    className="text-white py-3 px-4 rounded-lg hover:bg-red-600"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 5a2 2 0 0 0-1.344.519l-6.328 5.74a1 1 0 0 0 0 1.481l6.328 5.741A2 2 0 0 0 10 19h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2z"/><path d="m12 9 6 6"/><path d="m18 9-6 6"/></svg>
+                  </button>
+                </div>
+              ))}
+              <button
+                onClick={handleAddSource}
+                className="text-gray-500 px-2 py-2 -mt-2 -ml-2 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+              </button>
             </div>
           )}
 
