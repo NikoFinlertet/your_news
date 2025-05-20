@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 
 export async function setCookie(user_id: string) {
-    cookies().set({
+    (await cookies()).set({
         name: 'yournews_user_id',
         value: user_id,
         httpOnly: true,
@@ -12,7 +12,7 @@ export async function setCookie(user_id: string) {
 }
 
 export async function getCookie() {
-    const cookie = cookies().get('yournews_user_id');
+    const cookie = (await cookies()).get('yournews_user_id');
     
     return cookie?.value;
 }
