@@ -2,24 +2,95 @@
 
 import { ChangeEventHandler, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getSources } from '@/lib/dataProvider';
+import { getSources, supabase } from '@/lib/dataProvider';
+import { useCookies } from 'next-client-cookies';
 
 // Mock server actions
-const updateAboutYou = async (data: { about: string }) => {
+const getAboutYou = async (user_id: string) => {
+  if (!supabase) {
+    console.log('Supabase client is not initialized');
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from('users')
+    .select('description')
+    .eq('id', user_id)
+    .single();
+  
+  if (error) {
+    console.error('Supabase error:', error);
+    return null;
+  }
+
+  return data?.description;
+}
+
+const updateAboutYou = async (user_id: string, data: { about: string }) => {
+  if (!supabase) {
+    console.log('Supabase client is not initialized');
+    return null;
+  }
+
   console.log('Updating about you:', data);
-  // Simulate API call
-  // To supabase ai_profile
-  await new Promise(resolve => setTimeout(resolve, 1000));
+
+  const { data: res, error } = await supabase
+    .from('users')
+    .update({ description: data.about })
+    .eq('id', user_id);
+
+  if (error) {
+    console.error('Supabase error:', error);
+    return null;
+  }
+
+  return res;
 };
 
-const updateSources = async (data: { sources: string[] }) => {
-  console.log('Updating sources:', data);
-  // Simulate API call
-  // To supabase user_sources
-  await new Promise(resolve => setTimeout(resolve, 1000));
+const updateSources = async (user_id: string, data: { sources: string[] }) => {
+  // if (!supabase) {
+  //   console.log('Supabase client is not initialized');
+  //   return null;
+  // }
+
+  // console.log('Updating sources:', data);
+
+  // const { data: sourcesIds, error: source_error } = await supabase
+  //   .from('sources')
+  //   .select('id')
+  //   .in('title', data.sources);
+
+  // if (source_error) {
+  //   console.error('Supabase error:', source_error);
+  //   return null;
+  // }
+
+  // const { data: delete_res, error: delete_error } = await supabase
+  //   .from('user_sources')
+  //   .delete()
+  //   .eq('id', user_id)
+  //   .not('source_id', 'IN', sourcesIds.map(item => item.id));
+
+  // if (delete_error) {
+  //   console.error('Supabase error:', delete_error);
+  //   return null;
+  // }
+  
+  // // HOWTO insert?
+  // const { data: res, error: insert_error } = await supabase
+  //   .from('user_sources')
+  //   .insert(sourcesIds.map(item => ({ user_id, source_id: item.id })));
+
+  //   if (insert_error) {
+  //     console.error('Supabase error:', insert_error);
+  //     return null;
+  //   }
+
+  // return res;
+  return null;
 };
 
-const generateSources = async () => {
+const generateSources = async (user_id: string) => {
   console.log('Generating sources');
   // Simulate API call
   // /choose_posts_for_user
@@ -27,23 +98,53 @@ const generateSources = async () => {
   return ['the_holy_bible'];
 }
 
-const updateInterests = async (data: { interests: string[] }) => {
+const updateInterests = async (user_id: string, data: { interests: string[] }) => {
+  if (!supabase) {
+    console.log('Supabase client is not initialized');
+    return null;
+  }
+
   console.log('Updating interests:', data);
-  // Simulate API call
-  // To supabase queries
-  await new Promise(resolve => setTimeout(resolve, 1000));
+
+  const { data: res, error } = await supabase
+    .from('users')
+    .update({ queries: '[\n"' + data.interests.join('","') + '"\n]' })
+    .eq('id', user_id);
+  
+  if (error) {
+    console.error('Supabase error:', error);
+    return null;
+  }
+
+  return res;
 };
 
-const updateTimeSettings = async (data: { 
-  days: string[],
-  hour: string 
+const updateTimeSettings = async (user_id: string, data: { 
+  days: number[],
+  hour: number,
+  timeZone: string
 }) => {
+  if (!supabase) {
+    console.log('Supabase client is not initialized');
+    return null;
+  }
+
   console.log('Updating time settings:', data);
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 1000));
+
+  const { data: res, error } = await supabase
+    .from('users')
+    .update({ "cron_pattern": `0 ${data.hour} * * ${data.days.join(',')}`, timezone: data.timeZone })
+    .eq('id', user_id);
+  
+  if (error) {
+    console.error('Supabase error:', error);
+    return null;
+  }
+
+  return res;
 };
 
-const updateProfileLink = async (data: { link: string }) => {
+const updateProfileLink = async (user_id: string, data: { link: string }) => {
   console.log('Updating profile link:', data);
   // Simulate API call
   await new Promise(resolve => setTimeout(resolve, 1000));
@@ -60,6 +161,8 @@ const generateInterests = async () => {
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const cookies = useCookies();
+  const { timeZone } = Intl.DateTimeFormat().resolvedOptions();
   const [currentStep, setCurrentStep] = useState(0);
   const maxSteps = 3;
   const [profileLink, setProfileLink] = useState('');
@@ -73,10 +176,31 @@ export default function OnboardingPage() {
   const [selectedHour, setSelectedHour] = useState('09:00');
   const [isLoading, setIsLoading] = useState(false);
 
-  const weekDays = [
-    'Monday', 'Tuesday', 'Wednesday', 'Thursday',
-    'Friday', 'Saturday', 'Sunday'
+  const userId = cookies.get('yournews_user_id');
+  if (!userId) {
+    console.log('No user id found');
+    router.push('/');
+    return null;
+  }
+
+  const weekDaysList = [
+    'Понедельник', 'Вторник', 'Среда', 'Четверг',
+    'Пятница', 'Суббота', 'Воскресенье'
   ];
+
+
+  const weekDays: Record<string, number> = {
+    'Понедельник': 1, 'Вторник': 2, 'Среда': 3, 'Четверг': 4,
+    'Пятница': 5, 'Суббота': 6, 'Воскресенье': 7
+  };
+
+  const fetchAbout = async () => {
+    const about = await getAboutYou(userId);
+    setAbout(about || '');
+  }
+
+  if (!about)
+    fetchAbout();
 
   const fetchSources = async () => {
     const sources = await getSources();
@@ -93,19 +217,22 @@ export default function OnboardingPage() {
     try {
       switch (currentStep) {
         case 0:
-          setAbout(await updateProfileLink({ link: profileLink }));
-          await updateAboutYou({ about });
+          !about && setAbout(await updateProfileLink(userId, { link: profileLink }));
+          await updateAboutYou(userId, { about });
           break;
         case 1:
-          await updateInterests({ interests: interests.filter(i => i.trim() !== '') });
+          await updateInterests(userId, { interests: interests.filter(i => i.trim() !== '') });
           break;
         case 2:
-          await updateSources({ sources: selectedSources });
+          await updateSources(userId, { sources: selectedSources });
           break;
         case 3:
-          await updateTimeSettings({ 
-            days: selectedDays,
-            hour: selectedHour
+          console.log(selectedDays, selectedDays.map(day => weekDays[day]));
+          console.log(selectedHour, selectedHour.slice(0, 2), Number(selectedHour.slice(0, 2)));
+          await updateTimeSettings(userId, { 
+            days: selectedDays.map(day => weekDays[day]),
+            hour: Number(selectedHour.slice(0, 2)),
+            timeZone
           });
           break;
         default:
@@ -124,19 +251,20 @@ export default function OnboardingPage() {
     try {
       switch (currentStep) {
         case 0:
-          setAbout(await updateProfileLink({ link: profileLink }));
-          await updateAboutYou({ about });
+          !about && setAbout(await updateProfileLink(userId, { link: profileLink }));
+          await updateAboutYou(userId, { about });
           break;
         case 1:
-          await updateInterests({ interests: interests.filter(i => i.trim() !== '') });
+          await updateInterests(userId, { interests: interests.filter(i => i.trim() !== '') });
           break;
         case 2:
-          await updateSources({ sources: selectedSources });
+          await updateSources(userId, { sources: selectedSources });
           break;
         case 3:
-          await updateTimeSettings({ 
-            days: selectedDays,
-            hour: selectedHour
+          await updateTimeSettings(userId, { 
+            days: selectedDays.map(day => weekDays[day]),
+            hour: Number(selectedHour.slice(0, 2)),
+            timeZone
           });
           router.push('/');
           return;
@@ -156,7 +284,7 @@ export default function OnboardingPage() {
   const handleProfileLinkSubmit = async () => {
     setIsLoading(true);
     try {
-      const profileText = await updateProfileLink({ link: profileLink });
+      const profileText = await updateProfileLink(userId, { link: profileLink });
       setAbout(profileText);
     } catch (error) {
       console.error('Error:', error);
@@ -206,7 +334,7 @@ export default function OnboardingPage() {
   const handleGenerateSources = async () => {
     setIsLoading(true);
     try {
-      const generatedSources = await generateSources();
+      const generatedSources = await generateSources(userId);
       const sourcesToUpdate = [...selectedSources, ...generatedSources];
       setSelectedSources(sourcesToUpdate.reduce((acc, cur) => acc.includes(cur) ? acc : [...acc, cur], [] as string[]));
     } catch (error) {
@@ -234,7 +362,7 @@ export default function OnboardingPage() {
 
   return (
     <main className="min-h-screen flex items-center justify-center">
-      <div className="flex flex-col w-[640px] rounded-2xl p-8 border border-gray-200 shadow-lg">
+      <div className="flex flex-col w-[640px] max-h-[calc(100vh - 40px)] rounded-2xl p-8 border border-gray-200 shadow-lg">
         <div className="mb-8">
           <div className="flex justify-between mb-4">
             {['О себе', 'Интересы', 'Источники', 'Время дайджеста'].map((step, index) => (
@@ -302,7 +430,7 @@ export default function OnboardingPage() {
                     onClick={() => removeInterest(index)}
                     className="text-white py-3 px-4 rounded-lg hover:bg-red-600"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5a2 2 0 0 0-1.344.519l-6.328 5.74a1 1 0 0 0 0 1.481l6.328 5.741A2 2 0 0 0 10 19h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2z"/><path d="m12 9 6 6"/><path d="m18 9-6 6"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 5a2 2 0 0 0-1.344.519l-6.328 5.74a1 1 0 0 0 0 1.481l6.328 5.741A2 2 0 0 0 10 19h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2z"/><path d="m12 9 6 6"/><path d="m18 9-6 6"/></svg>
                   </button>
                 </div>
               ))}
@@ -311,13 +439,13 @@ export default function OnboardingPage() {
                   onClick={addInterestField}
                   className="text-gray-500 px-2 py-2 -mt-2 -ml-2 rounded-lg hover:bg-gray-200 transition-colors"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
                 </button>
                 <button
                   onClick={handleGenerateInterests}
                   className="text-gray-500 px-2 py-2 -mt-2 -ml-2 rounded-lg hover:bg-gray-200 transition-colors"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M9 13a4.5 4.5 0 0 0 3-4"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M12 13h4"/><path d="M12 18h6a2 2 0 0 1 2 2v1"/><path d="M12 8h8"/><path d="M16 8V5a2 2 0 0 1 2-2"/><circle cx="16" cy="13" r=".5"/><circle cx="18" cy="3" r=".5"/><circle cx="20" cy="21" r=".5"/><circle cx="20" cy="8" r=".5"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M9 13a4.5 4.5 0 0 0 3-4"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M12 13h4"/><path d="M12 18h6a2 2 0 0 1 2 2v1"/><path d="M12 8h8"/><path d="M16 8V5a2 2 0 0 1 2-2"/><circle cx="16" cy="13" r=".5"/><circle cx="18" cy="3" r=".5"/><circle cx="20" cy="21" r=".5"/><circle cx="20" cy="8" r=".5"/></svg>
                 </button>
               </div>
             </div>
@@ -332,7 +460,7 @@ export default function OnboardingPage() {
                   onClick={handleGenerateSources}
                   className="text-gray-500 px-3 py-3 rounded-lg hover:bg-gray-200 transition-colors"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M9 13a4.5 4.5 0 0 0 3-4"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M12 13h4"/><path d="M12 18h6a2 2 0 0 1 2 2v1"/><path d="M12 8h8"/><path d="M16 8V5a2 2 0 0 1 2-2"/><circle cx="16" cy="13" r=".5"/><circle cx="18" cy="3" r=".5"/><circle cx="20" cy="21" r=".5"/><circle cx="20" cy="8" r=".5"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M9 13a4.5 4.5 0 0 0 3-4"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M12 13h4"/><path d="M12 18h6a2 2 0 0 1 2 2v1"/><path d="M12 8h8"/><path d="M16 8V5a2 2 0 0 1 2-2"/><circle cx="16" cy="13" r=".5"/><circle cx="18" cy="3" r=".5"/><circle cx="20" cy="21" r=".5"/><circle cx="20" cy="8" r=".5"/></svg>
                 </button>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -358,7 +486,7 @@ export default function OnboardingPage() {
             <div className="space-y-4">
               <h2 className="text-2xl font-bold text-gray-300 mb-2">Когда вы хотите получать новости?</h2>
               <div className="grid grid-cols-2 gap-4">
-                {weekDays.map(day => (
+                {weekDaysList.map(day => (
                   <div key={day} className="flex items-center space-x-3">
                     <input
                       type="checkbox"
@@ -372,7 +500,7 @@ export default function OnboardingPage() {
                 ))}
               </div>
               <div className="mt-4">
-                <label className="block mb-2 text-gray-300">Во сколько вы бы хотели получать новости?</label>
+                <label className="block mb-2 text-gray-300">Во сколько вы бы хотели получать новости ({timeZone})?</label>
                 <input
                   type="time"
                   value={selectedHour}

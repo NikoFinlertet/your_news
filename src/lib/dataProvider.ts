@@ -7,7 +7,8 @@ import { Digest, Digest_News, News } from './types';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const supabase = supabaseUrl && supabaseKey 
+// FIXME: export
+export const supabase = supabaseUrl && supabaseKey 
   ? createClient(supabaseUrl, supabaseKey)
   : null;
 

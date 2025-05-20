@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { CookiesProvider } from 'next-client-cookies/server';
 import { Inter } from 'next/font/google';
 import '../styles/globals.css';
 
@@ -18,7 +19,7 @@ export default async function RootLayout({
   return (
     <html lang="ru">
       <body className={inter.className}>
-            <main>{children}</main>
+            <CookiesProvider>{children}</CookiesProvider>
       </body>
     </html>
   );

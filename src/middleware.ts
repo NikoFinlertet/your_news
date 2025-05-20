@@ -44,8 +44,7 @@ export async function middleware(req: NextRequest) {
 
   if (
     (req.nextUrl.pathname !== '/unauthorized' && req.nextUrl.pathname !== '/settings')
-    && (!data[0].ai_profile
-    || !data[0].description
+    && (!data[0].description
     || !data[0].queries
     || !data[0].cron_pattern
     || !data[0].timezone)
