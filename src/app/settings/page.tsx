@@ -4,6 +4,7 @@ import { ChangeEventHandler, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getSources, supabase } from '@/lib/dataProvider';
 import { useCookies } from 'next-client-cookies';
+import toast, { Toaster } from 'react-hot-toast';
 
 // Mock server actions
 const getAboutYou = async (user_id: string) => {
@@ -49,43 +50,78 @@ const updateAboutYou = async (user_id: string, data: { about: string }) => {
 
 // Here sources are one existing, refered to by title; new_sources are ones to create, refered by link
 const updateSources = async (user_id: string, data: { sources: string[], new_sources: string[] }) => {
-  // if (!supabase) {
-  //   console.log('Supabase client is not initialized');
-  //   return null;
-  // }
+  if (!supabase) {
+    console.log('Supabase client is not initialized');
+    return null;
+  }
 
-  // console.log('Updating sources:', data);
+  console.log('Updating sources:', data);
 
-  // const { data: sourcesIds, error: source_error } = await supabase
-  //   .from('sources')
-  //   .select('id')
-  //   .in('title', data.sources);
-
-  // if (source_error) {
-  //   console.error('Supabase error:', source_error);
-  //   return null;
-  // }
-
-  // const { data: delete_res, error: delete_error } = await supabase
-  //   .from('user_sources')
-  //   .delete()
-  //   .eq('id', user_id)
-  //   .not('source_id', 'IN', sourcesIds.map(item => item.id));
-
-  // if (delete_error) {
-  //   console.error('Supabase error:', delete_error);
-  //   return null;
-  // }
+  const { data: user_sources, error: user_sources_error } = await supabase
+    .from('user_sources')
+    .select('source_id')
+    .eq('user_id', user_id);
   
-  // // HOWTO insert?
-  // const { data: res, error: insert_error } = await supabase
-  //   .from('user_sources')
-  //   .insert(sourcesIds.map(item => ({ user_id, source_id: item.id })));
+  if (user_sources_error) {
+    console.error('Supabase error:', user_sources_error);
+    return null;
+  }
 
-  //   if (insert_error) {
-  //     console.error('Supabase error:', insert_error);
-  //     return null;
-  //   }
+  const { data: sourcesIdsByTitle, error: source_by_title_error } = await supabase
+    .from('sources')
+    .select('id')
+    .in('title', data.sources)
+
+  if (source_by_title_error) {
+    console.error('Supabase error:', source_by_title_error);
+    return null;
+  }
+
+  const { data: sourcesIdsByUrl, error: source_by_url_error } = await supabase
+    .from('sources')
+    .select('id')
+    .in('url', [...data.sources, ...data.new_sources])
+
+  if (source_by_url_error) {
+    console.error('Supabase error:', source_by_url_error);
+    return null;
+  }
+
+  const storedSourcesIds = [...sourcesIdsByTitle, ...sourcesIdsByUrl];
+
+  const { data: insert_sources, error: insert_sources_error } = await supabase
+    .from('sources')
+    .upsert(data.new_sources.map(item => ({ indexer_type: 'telegram', title: item.slice(item.indexOf('e/') + 2), url: item }), { onConflict: 'url' }))
+    .select('id');
+
+  // 23505 is a unique violation, which is expected in our case
+  if (insert_sources_error && insert_sources_error.code !== "23505") {
+    console.error('Supabase error:', insert_sources_error);
+    return null;
+  }
+
+  const sourcesIds = [...new Set([...storedSourcesIds, ...(insert_sources ?? [])])];
+
+  const { data: delete_res, error: delete_error } = await supabase
+    .from('user_sources')
+    .delete()
+    .eq('user_id', user_id)
+    .not('source_id', 'in', `(${sourcesIds.map(item => item.id).join(',')})`);
+
+  if (delete_error) {
+    console.error('Supabase error:', delete_error);
+    return null;
+  }
+  
+  const { data: res, error: insert_error } = await supabase
+    .from('user_sources')
+    .upsert(sourcesIds.map(item => ({ user_id, source_id: item.id })), { onConflict: 'user_id, source_id' });
+
+  // 23505 is a unique violation, which is expected in our case
+  if (insert_error && insert_error.code !== "23505") {
+    console.error('Supabase error:', insert_error);
+    return null;
+  }
 
   // return res;
   return null;
@@ -178,6 +214,10 @@ export default function OnboardingPage() {
   const [selectedHour, setSelectedHour] = useState('09:00');
   const [isLoading, setIsLoading] = useState(false);
 
+  const [fetchedAbout, setFetchedAbout] = useState(false);
+  const [fetchedSources, setFetchedSources] = useState(false);
+  const [fetchedInterests, setFetchedInterests] = useState(false);
+
   const userId = cookies.get('yournews_user_id');
   if (!userId) {
     console.log('No user id found');
@@ -201,8 +241,10 @@ export default function OnboardingPage() {
     setAbout(about || '');
   }
 
-  if (!about)
+  if (!fetchedAbout) {
     fetchAbout();
+    setFetchedAbout(true);
+  }
 
   const fetchSources = async () => {
     const sources = await getSources();
@@ -210,8 +252,10 @@ export default function OnboardingPage() {
     setFilteredSources(sources);
   }
 
-  if (!sources.length)
+  if (!fetchedSources) {
     fetchSources();
+    setFetchedSources(true);
+  }
 
   const handleChangeIndex = async (index: number) => {
     setIsLoading(true);
@@ -296,6 +340,10 @@ export default function OnboardingPage() {
   };
 
   const addInterestField = () => {
+    if (interests.length > 5) {
+      toast.error('Извините, но на текущий момент можно добавить только 5 интересов.');
+      return;
+    }
     setInterests(prev => [...prev, '']);
   };
 
@@ -576,6 +624,10 @@ export default function OnboardingPage() {
           </div>
         </div>
       </div>
+      <Toaster toastOptions={{style: {
+        color: '#ffffff',
+        backgroundColor: '#222222',
+      },}} />
     </main>
   );
 } 
