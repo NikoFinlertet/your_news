@@ -6,6 +6,8 @@ import { getSources, supabase } from '@/lib/dataProvider';
 import { useCookies } from 'next-client-cookies';
 import toast, { Toaster } from 'react-hot-toast';
 
+const API_PROFILER_LINK = process.env.NEXT_API_PROFILER_LINK;
+
 // Mock server actions
 const getAboutYou = async (user_id: string) => {
   if (!supabase) {
@@ -127,12 +129,43 @@ const updateSources = async (user_id: string, data: { sources: string[], new_sou
   return null;
 };
 
+interface IChoosePostsForUserResult {
+  interesting_source_ids: string[],
+}
+
 const generateSources = async (user_id: string) => {
+  if (!supabase) {
+    console.log('Supabase client is not initialized');
+    return null;
+  }
+
   console.log('Generating sources');
   // Simulate API call
   // /choose_posts_for_user
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  return ['the_holy_bible'];
+  const res: Response = await fetch(`${API_PROFILER_LINK}/posts/choose_for_user`, { method: 'POST', body: JSON.stringify({ user_id }) });
+  const data: IChoosePostsForUserResult | null = await res.json();
+
+  if (!data) {
+    console.error('Failed to generate sources');
+    return null;
+  }
+
+  if (!data.interesting_source_ids) {
+    console.error('No interesting sources found');
+    return null;
+  }
+
+  const { data: sources, error } = await supabase
+    .from('sources')
+    .select('title')
+    .in('id', data?.interesting_source_ids);
+  
+  if (error) {
+    console.error('Supabase error:', error);
+    return null;
+  }
+
+  return sources.map(item => item.title as string);
 }
 
 const updateInterests = async (user_id: string, data: { interests: string[] }) => {
@@ -385,6 +418,9 @@ export default function OnboardingPage() {
     setIsLoading(true);
     try {
       const generatedSources = await generateSources(userId);
+      if (!generatedSources) {
+        return;
+      }
       const sourcesToUpdate = [...selectedSources, ...generatedSources];
       setSelectedSources(sourcesToUpdate.reduce((acc, cur) => acc.includes(cur) ? acc : [...acc, cur], [] as string[]));
     } catch (error) {
