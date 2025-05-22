@@ -46,13 +46,14 @@ export async function middleware(req: NextRequest) {
   const user_id_in_cookies = req.cookies.get(USER_ID_IN_COOKIES)?.value;
 
   const user_id = user_id_in_params || user_id_in_cookies;
+
+
+  // Not to spam redirects
+  if (req.nextUrl.pathname === '/unauthorized' || req.nextUrl.pathname === '/home') {
+    return res;
+  }
   
   if (!user_id) {
-    // Not to spam redirects
-    if (req.nextUrl.pathname === '/unauthorized') {
-      console.log('Chef vse propalo!');
-      return res;
-    }
     // No user_id provided neither in url searchParams nor in cookies
     return NextResponse.redirect(new URL('/unauthorized', req.url));
   }
