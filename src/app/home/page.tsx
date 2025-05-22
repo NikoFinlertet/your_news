@@ -2,8 +2,91 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
+import Image from 'next/image';
 
-export default function Home() {
+const Navbar = () => {
+  return (
+    <nav className="fixed top-0 w-full bg-black/80 backdrop-blur-sm z-50">
+      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+        <Link href="/" className="text-2xl font-bold text-white">
+          YourNews
+        </Link>
+        <div className="flex gap-6">
+          <Link href="/docs" className="text-white hover:text-gray-300">Документация</Link>
+          <Link href="https://t.me/yournews_bot" className="text-white hover:text-gray-300">Telegram бот</Link>
+          <Link href="/contacts" className="text-white hover:text-gray-300">Контакты</Link>
+          <Link href="https://t.me/yournews_support" className="text-white hover:text-gray-300">Поддержка</Link>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+const HeroSection = () => {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-blue-900 flex items-center">
+      <div className="container mx-auto px-4 py-32">
+        <h1 className="text-6xl font-bold text-white mb-6">
+          Персонализированные новости для вас
+        </h1>
+        <p className="text-xl text-gray-300 mb-8 max-w-2xl">
+          Получайте только те новости, которые действительно важны для вас. 
+          Искусственный интеллект анализирует ваши интересы и формирует уникальную ленту.
+        </p>
+        <button className="bg-white text-black px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-200 transition-colors">
+          Присоединиться к бета-тестированию
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const FeaturesSection = () => {
+  const features = [
+    "🎯 Персонализированная лента новостей на основе ваших интересов",
+    "🤖 ИИ анализирует ваши предпочтения и улучшает рекомендации",
+    "📱 Раздача айфонов и пабаджи",
+    "🔔 Набьем золотые колокола на спине",
+    "📊 Аналитика ваших интересов и трендов",
+    "🌐 Поддержка множества источников новостей",
+    "🔒 Закроем вас в подвале",
+    "📈 Красная палка летит вверх. Stonks!",
+    "🇨🇳 +100500 рейтинга от партии Китая"
+  ];
+
+  return (
+    <div className="min-h-screen bg-black py-20">
+      <div className="container mx-auto px-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div className="relative h-[600px] w-full">
+            <Image
+              src="/ui-preview.png"
+              alt="UI Preview"
+              fill
+              className="object-contain"
+            />
+          </div>
+          <div className="space-y-6">
+            <h2 className="text-4xl font-bold text-white mb-8">
+              Что вас ждет в MVP
+            </h2>
+            <ul className="space-y-4">
+              {features.map((feature, index) => (
+                <li key={index} className="text-gray-300 text-lg flex items-start gap-3">
+                  <span className="text-2xl">{feature.split(' ')[0]}</span>
+                  <span>{feature.split(' ').slice(1).join(' ')}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default function HomePage() {
   const [submitted, setSubmitted] = useState(false);
 
   const handleClick = () => {
@@ -11,7 +94,10 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
+    <main className="bg-black">
+      <Navbar />
+      <HeroSection />
+      <FeaturesSection />
       <div className="container mx-auto px-4 py-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

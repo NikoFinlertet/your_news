@@ -82,7 +82,7 @@ export async function middleware(req: NextRequest) {
     console.error('Supabase error:', sourcesError);
     return res;
   }
-
+/*
   if (
     (req.nextUrl.pathname !== '/unauthorized' && req.nextUrl.pathname !== '/settings')
     && (!data[0].description
@@ -113,7 +113,7 @@ export async function middleware(req: NextRequest) {
     
     return response;
   }
-
+*/
   if (!user_id_in_params) {
     return res;
   }
