@@ -61,7 +61,7 @@ const FeaturesSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div className="relative h-[600px] w-full">
             <Image
-              src="/ui-preview.png"
+              src="/images/UI_preview.png"
               alt="UI Preview"
               fill
               className="object-contain"
